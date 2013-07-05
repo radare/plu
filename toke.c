@@ -778,11 +778,12 @@ Perl_parser_free(pTHX_  const yy_parser *parser)
     PL_curcop = parser->saved_curcop;
     SvREFCNT_dec(parser->linestr);
 
-    if (PL_parser->lex_flags & LEX_DONT_CLOSE_RSFP)
+    if (parser->rsfp) {
+      if (PL_parser->lex_flags & LEX_DONT_CLOSE_RSFP)
 	PerlIO_clearerr(parser->rsfp);
-    else if (parser->rsfp && (!parser->old_parser ||
-		(parser->old_parser && parser->rsfp != parser->old_parser->rsfp)))
+      else if ((!parser->old_parser || (parser->old_parser && parser->rsfp != parser->old_parser->rsfp)))
 	PerlIO_close(parser->rsfp);
+    }
     SvREFCNT_dec(parser->rsfp_filters);
 
     Safefree(parser->lex_brackstack);
